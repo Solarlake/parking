@@ -1,4 +1,5 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.121.1/build/three.module.js";
+import "https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js";
 
 document.addEventListener('DOMContentLoaded', function() {
     // const image = new Image("../static/images/park-sample2.png");
@@ -63,47 +64,30 @@ document.addEventListener('DOMContentLoaded', function() {
         cars[id] = box;
     }
 
-    function initCars() {
-        fetch('/api/get')
-            .then(response => response.json())
-            .then(data => {
-                data.forEach((element) => {
-                    const key = Object.keys(element)[0];
-                    addCar(key, element[keys][0], element[keys][1], element[keys][2], element[keys][3]);
-                });
-            });
-    }
-
-    function updateCars() {
-        fetch('/api/get')
-            .then(response => response.json())
-            .then(data => {
-                data.forEach((element) => {
-                    const key = Object.keys(element)[0];
-                    if (cars[key] === undefined) {
-                        addCar(key, element[key][0], element[key][1], element[key][2], element[key][3]);
-                    } else {
-                        moveCar(key, element[key][0], element[key][1], element[key][2], element[key][3]);
-                    }
-                });
-            });
-    }
-
-    // function clearScene() {
-    //     scene.children.forEach(child => {
-    //         if (child instanceof THREE.Mesh) {
-    //             scene.remove(child);
-    //         }
-    //     });
+    // function initCars() {
+    //     fetch('/api/get')
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             data.forEach((element) => {
+    //                 const key = Object.keys(element)[0];
+    //                 addCar(key, element[keys][0], element[keys][1], element[keys][2], element[keys][3]);
+    //             });
+    //         });
     // }
 
-    // function updateScene(data) {
-    //     clearScene();
-    //     data.forEach(element => {
-    //         renderCar(element);
-    //     });
-    //     renderer.render(scene, camera);
-    //     clearScene();
+    // function updateCars() {
+    //     fetch('/api/get')
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             data.forEach((element) => {
+    //                 const key = Object.keys(element)[0];
+    //                 if (cars[key] === undefined) {
+    //                     addCar(key, element[key][0], element[key][1], element[key][2], element[key][3]);
+    //                 } else {
+    //                     moveCar(key, element[key][0], element[key][1], element[key][2], element[key][3]);
+    //                 }
+    //             });
+    //         });
     // }
 
     function startTracking() {
@@ -112,21 +96,27 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => console.log(data));
     }
 
-    // function getData() {
-    //     fetch('/api/get')
-    //         .then(response => response.json())
-    //         .then(data => updateScene(data));
-    // }
+    const socket = io.connect();
+    socket.on('data', function(data) {
+        if (data === undefined) return;
+
+        data.forEach((element) => {
+            const key = Object.keys(element)[0];
+            if (cars[key] === undefined) {
+                addCar(key, element[key][0], element[key][1], element[key][2], element[key][3]);
+            } else {
+                moveCar(key, element[key][0], element[key][1], element[key][2], element[key][3]);
+            }
+        });
+    });
 
     startTracking();
-    initCars();
-    setInterval(updateCars, 50);
+    // initCars();
+    // setInterval(updateCars, 50);
 
     function animate() {
         requestAnimationFrame(animate);
         renderer.render(scene, camera);
     }
     animate();
-
-    // setInterval(getData, 100);
 });
