@@ -32,10 +32,11 @@ class Yolo:
             names = result.names
             xyxy = boxes.xyxy.tolist()
             cls = boxes.cls.tolist()
+            ids = boxes.id.tolist()
             output = []
-            for i, item in enumerate(cls):
-                output.append({names[item]: xyxy[i]})
-                print(names[item], xyxy[i])
+            for i, id in enumerate(ids):
+                output.append({id: xyxy[i]})
+                print(output[-1])
                 self.current["data"] = output
 
             annotated_frame = results[0].plot()

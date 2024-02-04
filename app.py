@@ -14,12 +14,11 @@ def index():
 
 @app.route('/api/start')
 def start():
-    yolo.predict_video_track('static/videos/gilbert.mp4')
+    yolo.predict_video_track('static/videos/backing.mp4')
     return json.dumps({"status": "done"})
 
 @app.route('/api/get')
 def get():
-    # return yolo.predict_image('static/images/park-sample2.png')
     return yolo.current["data"]
 
 app.run(host='127.0.0.1', port=5000)
