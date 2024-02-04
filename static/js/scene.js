@@ -16,7 +16,9 @@ document.addEventListener('DOMContentLoaded', function() {
     camera.rotation.set(-Math.PI/4, 0, 0);
     // camera.rotation.set(-Math.PI/2, 0, 0);
 
-    const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#bg') });
+    const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#bg'), alpha: true });
+    document.getElementById( 'canvasBox' ).appendChild(renderer.domElement);
+
     renderer.setPixelRatio(width / height);
     renderer.setSize(width, height);
 
@@ -30,8 +32,8 @@ document.addEventListener('DOMContentLoaded', function() {
     directionalLight.position.set(0, 1, 1);
     scene.add(directionalLight);
 
-    const background = new THREE.TextureLoader().load("../static/images/park-sample2.png");
-    scene.background = background;
+    // const background = new THREE.TextureLoader().load("../static/images/park-sample2.png");
+    // scene.background = background;
 
     renderer.render(scene, camera);
 
