@@ -107,8 +107,13 @@ function renderParkingLot(width, height, data, lotData, takenSpots) {
   // set up canvas with the right dimensions
   const scene = new THREE.Scene();
   const camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
-  const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#bg') });
-  document.body.appendChild(renderer.domElement);
+  const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#bg'), alpha: true });
+  
+  // container = document.getElementById( 'canvasBox' );
+  // document.body.appendChild(container);
+  
+  document.getElementById( 'canvasBox' ).appendChild(renderer.domElement);
+  // document.container.appendChild(renderer.domElement);
   renderer.setPixelRatio(width / height);
   renderer.setSize(width, height);
 
@@ -222,10 +227,10 @@ function renderParkingLot(width, height, data, lotData, takenSpots) {
   scene.add(ambientLight);
 
   // const background = new THREE.TextureLoader().load(lotImage.src);
-  const background = new THREE.TextureLoader().load('../static/images/big-grid.jpeg');
+  // const background = new THREE.TextureLoader().load('../static/images/big-grid.jpeg');
 
 
-  scene.background = background;
+  // scene.background = background;
 
   var animate = function() {
     requestAnimationFrame(animate);
