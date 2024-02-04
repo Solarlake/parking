@@ -1,7 +1,9 @@
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.121.1/build/three.module.js";
+
 document.addEventListener('DOMContentLoaded', function() {
     // const image = new Image("../static/images/park-sample2.png");
-    width = 1000; // image.width
-    height = 667; // image.height
+    const width = 1000; // image.width
+    const height = 667; // image.height
 
     // ====================
     
