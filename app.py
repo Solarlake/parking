@@ -17,6 +17,7 @@ def index():
 @app.route('/api/start')
 def start():
     yolo.predict_video_track('static/videos/backing.mp4')
+    yolo.reset()
     return json.dumps({"status": "done"})
 
 @app.route('/api/get')

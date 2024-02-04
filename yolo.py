@@ -46,6 +46,13 @@ class Yolo:
 
         cv2.destroyAllWindows()
 
+    def reset(self):
+        self.current = {
+            "width": 0,
+            "height": 0,
+            "data": None
+        }
+
     # def predict_image(self, image_path, conf=0.1):
     #     results = self.model.predict(image_path, conf=conf)
     #     result = results[0]
