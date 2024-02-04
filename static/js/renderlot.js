@@ -1,5 +1,5 @@
-
-
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.121.1/build/three.module.js";
+import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/loaders/GLTFLoader.js";
 
 const lotImage = new Image();
 lotImage.src = '../static/images/park-sample2.png';
@@ -14,7 +14,6 @@ const jsonData = [{"cell phone": [518.94384765625, 269.96221923828125, 568.92492
 const lotJsonData = {
   
 }
-
 
 renderParkingLot(lotImage.width, lotImage.height, jsonData, lotJsonData);
 
@@ -36,7 +35,8 @@ function renderParkingLot(width, height, data, lotData) {
   
   // helper function for rendering a box on top of a parking spot thats full
   function renderFullSpot(data){
-    key = Object.keys(data)[0]
+    
+    const key = Object.keys(data)[0]
     console.log(data[key])
 
     let x1= data[key][0];
@@ -57,9 +57,42 @@ function renderParkingLot(width, height, data, lotData) {
 
     scene.add(box);
   }
+
+  // instead of rendering a box for each parking spot, we'll render a 3d model for each parking spot
+  // uses a top down view of the car instead of a side view
+  function renderCarSpot(data){
+    const key = Object.keys(data)[0]
+    // console.log(data[key])
+
+    let x1= data[key][0];
+    let y1= data[key][1];
+    let x2= data[key][2];
+    let y2= data[key][3];
+
+    const loader = new GLTFLoader();
+
+    loader.load('./static/models/untitled.glb', function (gltf) {
+      gltf.scene.scale.set(20, 20, 20);
+      gltf.scene.position.x = x1 - width / 2 + (x2 - x1) / 2;
+      gltf.scene.position.y = -y1 + height / 2 - (y2 - y1) / 2 + 25;
+      gltf.scene.position.z = 0;
+      gltf.scene.rotation.x = Math.PI / 2;
+      gltf.scene.rotation.y = -Math.PI / 2;
+      // hard coded these cause idk math hehe
+      
+      scene.add(gltf.scene);
+  }, undefined, function (error) {
+      console.error(error);
+  });
+
+  
+    
+  }
+
   // for each obstruction, let's render a box
   for(let i = 0; i < data.length; i++){
-    renderFullSpot(data[i]);
+    // renderFullSpot(data[i]);
+    renderCarSpot(data[i]);
   }
 
 
