@@ -3,6 +3,8 @@ import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.121.1/examples/
 
 const lotImage = new Image();
 lotImage.src = '../static/images/park-sample2.png';
+// lotImage.src = '../static/images/gilbert-lot-still.jpg';
+
 
 // filePath = '/static/json/results.json';
 // const reader = new FileReader();
@@ -12,14 +14,96 @@ const jsonData = [{"cell phone": [518.94384765625, 269.96221923828125, 568.92492
 // console.log(jsonData);
 
 const lotJsonData = {
-  
+  "spots": [
+      [-20, 270, 55, 419],
+      [61, 270, 134, 420],
+      [139, 270, 207, 421],
+      [213, 273, 280, 420],
+      [286, 275, 357, 421],
+      [363, 276, 430, 420],
+      [435, 276, 502, 420],
+      [508, 277, 579, 420],
+      [584, 278, 654, 421],
+      [658, 278, 725, 420],
+      [731, 279, 798, 422],
+      [807, 282, 900, 422],
+
+      [-20, 424, 55, 568],
+      [61, 425, 134, 568],
+      [139, 426, 207, 568],
+      [213, 425, 280, 568],
+      [286, 426, 357, 568],
+      [363, 425, 430, 568],
+      [435, 425, 502, 568],
+      [508, 425, 579, 568],
+      [584, 426, 654, 568],
+      [658, 425, 725, 568],
+      [731, 427, 798, 568],
+      [807, 427, 900, 568],
+      
+      [-20, -70, 53, 80],
+      [59, -70, 130, 82],
+      [138, -70, 205, 83],
+      [212, -70, 281, 84],
+      [285, -70, 357, 84],
+      [365, -70, 434, 85],
+      [436, -70, 505, 86],
+      [511, -70, 585, 87],
+      [587, -70, 659, 88],
+      [666, -70, 730, 88],
+      [735, -70, 802, 88],
+      [809, -70, 909, 88]
+  ]
 }
 
-renderParkingLot(lotImage.width, lotImage.height, jsonData, lotJsonData);
+
+document.addEventListener('DOMContentLoaded', function(){
+  // calculate which spots are taken
+
+  let takenspots = []
+  for(let i = 0; i < jsonData.length; i++){
+    let taken = isInSpot(jsonData[i], lotJsonData);
+    if(taken){
+      takenspots.push(taken);
+    }
+  }
+
+  function onlyUnique(value, index, array) {
+    return array.indexOf(value) === index;
+  }
+  var unique = takenspots.filter(onlyUnique);
+
+
+  let openspots = lotJsonData.spots.length - unique.length;
+  console.log(openspots)
+  document.getElementById('spotNumber').innerHTML = openspots;
+
+
+  // render the actual scene
+  renderParkingLot(lotImage.width, lotImage.height, jsonData, lotJsonData, takenspots);
+
+})
+
+function isInSpot(car, lotData){
+  const key = Object.keys(car)[0]
+  let centroidx = (car[key][2] + car[key][0])/2;
+  let centroidy = (car[key][3] + car[key][1])/2;
+  for(let i = 0; i < lotData.spots.length; i++){
+    let x1= lotData.spots[i][0];
+    let y1= lotData.spots[i][1];
+    let x2= lotData.spots[i][2];
+    let y2= lotData.spots[i][3];
+
+    if(centroidx < x2 && centroidx > x1 && centroidy < y2 && centroidy >y1){
+      return i;
+    }
+  }
+  return null;
+}
 
 
 
-function renderParkingLot(width, height, data, lotData) {
+function renderParkingLot(width, height, data, lotData, takenSpots) {
   // set up canvas with the right dimensions
   const scene = new THREE.Scene();
   const camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
@@ -58,6 +142,31 @@ function renderParkingLot(width, height, data, lotData) {
     scene.add(box);
   }
 
+  // helper function that renders a gray rectangle where a spot is, according to
+  // the parking lot data
+  function renderSpotBox(data, i){
+    let x1= data[0];
+    let y1= data[1];
+    let x2= data[2];
+    let y2= data[3];
+
+    const geometry = new THREE.BoxGeometry(x2-x1, y2-y1, 1);
+
+    var material = new THREE.MeshStandardMaterial({ color: 0xcccccc });
+    if(!takenSpots.includes(i)){
+      material = new THREE.MeshStandardMaterial({ color: 0x93dd7d });
+    }
+    
+    const box = new THREE.Mesh(geometry, material);
+    
+    box.position.x = x1 - width/2 + (x2-x1)/2;
+    box.position.y = -y1 + height/2 - (y2-y1)/2;
+    box.position.z = -1;
+
+    scene.add(box);
+
+  }
+
   // instead of rendering a box for each parking spot, we'll render a 3d model for each parking spot
   // uses a top down view of the car instead of a side view
   function renderCarSpot(data){
@@ -89,11 +198,20 @@ function renderParkingLot(width, height, data, lotData) {
     
   }
 
-  // for each obstruction, let's render a box
+  // for each spot in the registered parking lot, lets render a box
+  for(let i = 0; i < lotData.spots.length; i++){
+    renderSpotBox(lotData.spots[i], i);
+  }
+
+
+
+
+  // for each obstruction, let's render a car
   for(let i = 0; i < data.length; i++){
     // renderFullSpot(data[i]);
     renderCarSpot(data[i]);
   }
+
 
 
   // const pointLight = new THREE.PointLight(0xffffff);
@@ -103,7 +221,9 @@ function renderParkingLot(width, height, data, lotData) {
   const ambientLight = new THREE.AmbientLight(0xffffff);
   scene.add(ambientLight);
 
-  const background = new THREE.TextureLoader().load("../static/images/park-sample2.png");
+  // const background = new THREE.TextureLoader().load(lotImage.src);
+  const background = new THREE.TextureLoader().load('../static/images/big-grid.jpeg');
+
 
   scene.background = background;
 
