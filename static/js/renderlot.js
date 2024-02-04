@@ -2,7 +2,7 @@
 
 
 const lotImage = new Image();
-lotImage.src = '/static/images/park-sample2.png';
+lotImage.src = '../static/images/park-sample2.png';
 
 // filePath = '/static/json/results.json';
 // const reader = new FileReader();
