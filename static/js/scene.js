@@ -1,15 +1,14 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const image = new Image("../static/images/park-sample2.png");
-
-    width = image.width;
-    height = image.height;
+    // const image = new Image("../static/images/park-sample2.png");
+    width = 1000; // image.width
+    height = 667; // image.height
 
     // ====================
-
+    
     const scene = new THREE.Scene();
 
-    const camera = new THREE.PerspectiveCamera(61.9, width/height, 0.1, 1000);
-    camera.position.set(0, 500, 500);
+    const camera = new THREE.PerspectiveCamera(61.9, width/height, 0.1, 2000);
+    camera.position.set(0, 500, 400);
     camera.rotation.set(-Math.PI/4, 0, 0);
 
     const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#bg') });
@@ -27,9 +26,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
     renderer.render(scene, camera);
 
+    // ...
+
+    // const loader = new THREE.STLLoader();
+    // loader.load('../static/models/car.stl', function(geometry) {
+    //     const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+    //     const car = new THREE.Mesh(geometry, material);
+    //     car.position.set(0, 0, 0); // Set the position of the car
+    //     scene.add(car);
+    // });
+
+    // ...
+
     function renderCar(data) {
         key = Object.keys(data)[0]
-        console.log(data[key])
 
         let x1 = data[key][0];
         let y1 = data[key][1];
@@ -47,20 +57,36 @@ document.addEventListener('DOMContentLoaded', function() {
         scene.add(box);
     }
 
+    function clearScene() {
+        scene.children.forEach(child => {
+            if (child instanceof THREE.Mesh) {
+                scene.remove(child);
+            }
+        });
+    }
+
     function updateScene(data) {
+        clearScene();
         data.forEach(element => {
             renderCar(element);
         });
         renderer.render(scene, camera);
+        clearScene();
     }
 
-    function fetchData() {
+    function startTracking() {
+        fetch('/api/start')
+            .then(response => response.json())
+            .then(data => console.log(data));
+    }
+
+    function getData() {
         fetch('/api/get')
             .then(response => response.json())
             .then(data => updateScene(data));
     }
 
-    fetchData();
+    startTracking();
 
-    setInterval(fetchData, 5000);
+    setInterval(getData, 100);
 });

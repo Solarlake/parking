@@ -5,7 +5,7 @@ import json
 import torch
 
 # Load a pretrained YOLO model (recommended for training)
-model = YOLO('yolov8n.pt')
+model = YOLO('yolov8x.pt')
 
 print(f"has cuda: {torch.cuda.is_available()}")
 
